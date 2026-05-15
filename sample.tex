@@ -1,0 +1,123 @@
+\documentclass{article}
+\usepackage[czech]{babel}
+\usepackage{luavlna}
+\usepackage{lua-widow-control}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\setmainfont{Droid Sans}
+% \setmainfont{Literata}
+% \setmainfont{Bitter} % tenhle font nepodporuje některý český znaky, takže je nepoužitelnej
+
+% tohle je špatná velikost, protože xteink x4 má 220 ppi takže musíme rozměry přepočítat
+% \usepackage[paperwidth=480bp,paperheight=800bp,margin=10bp]{geometry}
+
+% tohle je lepší, protože 480bp je 2.18 palce, což je 55.4mm, což je 157.1bp, takže to odpovídá rozměrům displeje
+% 480/220 = 2.18, takže 480bp je 2.18 palce, což je 55.4mm, což je 157.1bp
+% \usepackage[paperwidth=157.1bp, paperheight=261.8bp, margin=5bp]{geometry}
+
+% Ale Crosspoint má omezenej viewport, na 464×765 pixelů, takže musíme použít takovou deklaraci:
+\usepackage[
+  paperwidth=151.85bp,
+  paperheight=250.36bp,
+  margin=5bp
+]{geometry}
+
+\usepackage{linebreaker}
+\usepackage[characters=30,scale=heptatonic]{responsive}
+\usepackage{microtype}
+\usepackage{lipsum}
+\begin{document}
+
+\section{Jak je třeba vytvořit Epub pro Xteink}
+
+Zatím žádnej firmware pro Xteink X4 nepodporuje PDF, takže je třeba vytvořit soubor, kterej půjde přečíst.
+V zásadě máme dvě možnosti -- vytvořit XTC soubor, nebo Epub obsahující stránky PDF vyrenderovaný do PNG. 
+XTC je bitmapovej formát, buď černobílej, nebo se 4 odstínama šedi. Existujou různý konvertory, třeba Xtctools pro 
+příkazovou řádku, nebo další, který jsou online. Soubor z Xtctools se mi ale ve firmwaru Crosspoint neotevře,
+hlásí to chybu, takže je třeba použít online služby. Výsledek je ale stejně vyrenderovanej v nízký kvalitě, takže 
+je špatně čitelnej.
+
+Takže další možnost je vygenerovat ten Epub. Pro tvorbu obrázků stránek můžeme použít Pdftocairo:
+
+\begin{verbatim}
+$ pdftocairo  -gray -png -scale-to 800 sample.pdf
+\end{verbatim}
+
+Pro parameter \texttt{-scale-to} je třeba zvolit hodnotu, která odpovídá výšce displeje Xteink X4, teda 800 pixelů.
+Výsledek pak převádím skriptíkem, co každou stránku obalí do HTML a vytvoří z nich Epub. Pořád to vypadá trošku hůř,
+než jak se zobrazí normální textovej Epub, což je trošku opruz. Ale aspoň je vidět, že to jde.
+
+V Crosspointu je nastavenej omezen viewport kvůli statusbaru, takže ve skutečnosti je viewport omezenej na 765 pixelů:
+
+\begin{verbatim}
+$ pdftocairo  -gray -png -scale-to 765 sample.pdf
+\end{verbatim}
+
+
+\begin{verbatim}
+$ texlua img2epub.lua adresar output.epub
+\end{verbatim}
+
+Ten skriptík vezme všechny PNG soubory v adresáři a udělá z nich Epub. Výsledek pořád neni ideální, protože Crosspoint očividně
+ty obrázky dál zmenšuje a nějak převádí, takže výsledek je hůř čitelnej, než byl originál.
+
+Taky jsem zkoušel vytvořit mono soubor z \texttt{pdftocairo} pomocí:
+
+\begin{verbatim}
+$ pdftocairo  -gray -png -scale-to 800 sample.pdf
+\end{verbatim}
+
+Ale výslednej Epub Crosspoint ani neotevřel, skončilo to chybou. 
+
+Další pokus byl vytvořit PNG soubory s 16 barvama, což by mělo bejt množství, co podporuje ten displej. Buď s ditheringem:
+
+\begin{verbatim}
+magick sample-*.png -colorspace Gray -dither zhoufang -colors 16 output.png
+\end{verbatim}
+
+Nebo bez ditheringu:
+
+\begin{verbatim}
+magick sample-*.png -colorspace Gray -colors 16 output.png
+\end{verbatim}
+
+Bez ditheringu na počítači vypadá výsledek líp a i na čtečce asi vypadá trošku líp, ale stejně je to pořád deformovaný. 
+
+Asi bude třeba vyzkoušet nějaký jiný firmware, ale skoro všechno je založený na Crosspointu, takže to nevypadá moc nadějně.
+
+\subsection{Další pokus s XTC}
+
+Vyzkoušel jsem ještě jednou vytvořit XTC soubor pomocí \texttt{cbz2xtc} (\protect\url{https://github.com/srokl/cbz2xtc}), 
+který vytváří soubor, co přečte i Crosspoint. Teda aspoň ten černobílej, umí i soubor XTCH, se 4 odstínama šedi, ale 
+ten Crosspoint neotevře s hláškou \texttt{Memory error}. 
+
+Musel jsem trošku zasáhnout do zdrojáků toho nástroje, protože vždycky rozsekává stránky na několik obrázků. S touhle změnou 
+pak můžu spustit: 
+
+\begin{verbatim}
+python3 nosplit.py --clean --contrast-boost 2   --no-split --no-dither ~/ebooks/xtctest/sample.pdf
+\end{verbatim}
+
+To je moje modifikovaná verze skriptu \texttt{cbz2xtc.py}. Volbu \texttt{--no-split} jsem přidal já. Contrast boost trošku
+zesílí písmo. Dithering je zakázanej, protože pro text vlastně vůbec nefunguje dobře.
+
+Výsledek má občas trošku deformovaný písmenka, ale jinak to vypadá minimálně stejně dobře, jako ten Epub, možná i trošku líp.
+
+\subsection{Pokus s Papyrus}
+
+Papyrus je alternativní firmware, co vypadá, že má širší podporu pro Epub a XTC. Má dost odlišný ovládání než Crosspoint nebo 
+původní firmware, takže je třeba se s ním trochu seznámit. Po nahrání 2bitových XTC souboru, co jsem vytvořil pomocí \texttt{cbz2xtc}, 
+se mi ho podařilo otevřít, což je pozitivní. Rendering taky vypadá dobře, i když při přechodu na každou stranu se nejdřív 
+zobrazí v nižším rozlišení a teprv po zlomku vteřiny se zobrazí vyhlazenej text. Obecně je ten firmware pomalej a otevření 
+souboru trvá několik sekund, ale aspoň se to zobrazuje dobře.
+
+Problém je u Epubu. Tam trvá citelně dlouho přechod na každou novou stránku a navíc zobrazuje prázdnou stránku po každym obrázku. 
+Obrázky samotný nerenderuje o nic líp, než Crosspoint. Taky v README píšou, že podporujou BMP soubory v Epubu, což je teda 
+nevalidní, ale i tak jsem to zkusil. A nefunguje to. Naděje byla, že šestnácti barvou bitmapu to vykreslí s většíma detailama, 
+než Crosspoint.
+
+Závěr je, že XTCH se zobrauje dobře, ale je to obecně pomalý, tak budu ještě zkoušet dál.
+
+% input{cviceni}
+% \input{epigram}
+\end{document}
