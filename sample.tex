@@ -1,12 +1,39 @@
+\DocumentMetadata{
+  pdfstandard=A-2u,
+  lang=cs
+}
+
+\tagpdfsetup{activate-all}
 \documentclass{article}
 \usepackage[czech]{babel}
 \usepackage{luavlna}
 \usepackage{lua-widow-control}
 \usepackage{fontspec}
 \usepackage{hyperref}
-\setmainfont{Droid Sans}
-% \setmainfont{Literata}
-% \setmainfont{Bitter} % tenhle font nepodporuje některý český znaky, takže je nepoužitelnej
+\usepackage[]{listings}
+
+% šipka pro zalomení dlouhých řádků v listings, měla by se skrýt při kopírování z PDF
+% \newcommand{\postbreaksymbol}{%
+%   \tagmcbegin{tag=Span,actualtext={}}%
+%   \texttt{↪ }%
+%   \tagmcend
+% }
+
+% ale zdá se, že interní příkazy z latexu na tohle zatím nefungujou, takže použijeme balíček accsup
+\usepackage{accsupp}
+
+\newcommand{\postbreaksymbol}{%
+  \BeginAccSupp{ActualText={}}%
+  \texttt{↪ }%
+  \EndAccSupp{}%
+}
+
+
+% breaklines a breakatwhitespace jsou důležitý, protože bez nich se nám text nevejde do viewportu a bude se zobrazovat jenom část stránky
+\lstset{language=bash, basicstyle=\ttfamily\small, breaklines=true, breakatwhitespace=true, postbreak=\mbox{\postbreaksymbol}}
+% \setmainfont{Droid Sans}
+\setmainfont{Literata}
+\setmonofont{JetBrains Mono}
 
 % tohle je špatná velikost, protože xteink x4 má 220 ppi takže musíme rozměry přepočítat
 % \usepackage[paperwidth=480bp,paperheight=800bp,margin=10bp]{geometry}
@@ -23,10 +50,13 @@
 ]{geometry}
 
 \usepackage{linebreaker}
+
 \usepackage[characters=30,scale=heptatonic]{responsive}
 \usepackage{microtype}
 \usepackage{lipsum}
 \begin{document}
+
+\linebreakersetup{maxemergencystretch=1em}
 
 \section{Jak je třeba vytvořit Epub pro Xteink}
 
@@ -39,9 +69,9 @@ je špatně čitelnej.
 
 Takže další možnost je vygenerovat ten Epub. Pro tvorbu obrázků stránek můžeme použít Pdftocairo:
 
-\begin{verbatim}
-$ pdftocairo  -gray -png -scale-to 800 sample.pdf
-\end{verbatim}
+\begin{lstlisting}
+$ pdftocairo -gray -png -scale-to 800 sample.pdf
+\end{lstlisting}
 
 Pro parameter \texttt{-scale-to} je třeba zvolit hodnotu, která odpovídá výšce displeje Xteink X4, teda 800 pixelů.
 Výsledek pak převádím skriptíkem, co každou stránku obalí do HTML a vytvoří z nich Epub. Pořád to vypadá trošku hůř,
@@ -49,37 +79,37 @@ než jak se zobrazí normální textovej Epub, což je trošku opruz. Ale aspoň
 
 V Crosspointu je nastavenej omezen viewport kvůli statusbaru, takže ve skutečnosti je viewport omezenej na 765 pixelů:
 
-\begin{verbatim}
+\begin{lstlisting}
 $ pdftocairo  -gray -png -scale-to 765 sample.pdf
-\end{verbatim}
+\end{lstlisting}
 
 
-\begin{verbatim}
+\begin{lstlisting}
 $ texlua img2epub.lua adresar output.epub
-\end{verbatim}
+\end{lstlisting}
 
 Ten skriptík vezme všechny PNG soubory v adresáři a udělá z nich Epub. Výsledek pořád neni ideální, protože Crosspoint očividně
 ty obrázky dál zmenšuje a nějak převádí, takže výsledek je hůř čitelnej, než byl originál.
 
 Taky jsem zkoušel vytvořit mono soubor z \texttt{pdftocairo} pomocí:
 
-\begin{verbatim}
+\begin{lstlisting}
 $ pdftocairo  -gray -png -scale-to 800 sample.pdf
-\end{verbatim}
+\end{lstlisting}
 
 Ale výslednej Epub Crosspoint ani neotevřel, skončilo to chybou. 
 
 Další pokus byl vytvořit PNG soubory s 16 barvama, což by mělo bejt množství, co podporuje ten displej. Buď s ditheringem:
 
-\begin{verbatim}
-magick sample-*.png -colorspace Gray -dither zhoufang -colors 16 output.png
-\end{verbatim}
+\begin{lstlisting}
+$ magick sample-*.png -colorspace Gray -dither zhoufang -colors 16 output.png
+\end{lstlisting}
 
 Nebo bez ditheringu:
 
-\begin{verbatim}
-magick sample-*.png -colorspace Gray -colors 16 output.png
-\end{verbatim}
+\begin{lstlisting}
+$ magick sample-*.png -colorspace Gray -colors 16 output.png
+\end{lstlisting}
 
 Bez ditheringu na počítači vypadá výsledek líp a i na čtečce asi vypadá trošku líp, ale stejně je to pořád deformovaný. 
 
@@ -94,9 +124,9 @@ ten Crosspoint neotevře s hláškou \texttt{Memory error}.
 Musel jsem trošku zasáhnout do zdrojáků toho nástroje, protože vždycky rozsekává stránky na několik obrázků. S touhle změnou 
 pak můžu spustit: 
 
-\begin{verbatim}
-python3 nosplit.py --clean --contrast-boost 2   --no-split --no-dither ~/ebooks/xtctest/sample.pdf
-\end{verbatim}
+\begin{lstlisting}
+$ python3 nosplit.py --clean --contrast-boost 2   --no-split --no-dither ~/ebooks/xtctest/sample.pdf
+\end{lstlisting}
 
 To je moje modifikovaná verze skriptu \texttt{cbz2xtc.py}. Volbu \texttt{--no-split} jsem přidal já. Contrast boost trošku
 zesílí písmo. Dithering je zakázanej, protože pro text vlastně vůbec nefunguje dobře.
