@@ -40,23 +40,25 @@
 
 % tohle je lepší, protože 480bp je 2.18 palce, což je 55.4mm, což je 157.1bp, takže to odpovídá rozměrům displeje
 % 480/220 = 2.18, takže 480bp je 2.18 palce, což je 55.4mm, což je 157.1bp
-% \usepackage[paperwidth=157.1bp, paperheight=261.8bp, margin=5bp]{geometry}
+\usepackage[paperwidth=157.1bp, paperheight=261.8bp, margin=5bp]{geometry}
 
-% Ale Crosspoint má omezenej viewport, na 464×765 pixelů, takže musíme použít takovou deklaraci:
-\usepackage[
-  paperwidth=151.85bp,
-  paperheight=250.36bp,
-  margin=5bp
-]{geometry}
+% % Crosspoint má omezenej viewport, na 464×765 pixelů, takže můžeme použít následující deklaraci, ale vypadá to, že
+% je stejně lepší použít celou velikost displeje
+% \usepackage[
+%   paperwidth=151.85bp,
+%   paperheight=250.36bp,
+%   margin=5bp
+% ]{geometry}
 
 \usepackage{linebreaker}
 
-\usepackage[characters=30,scale=heptatonic]{responsive}
+\usepackage[characters=35 ,scale=heptatonic]{responsive}
 \usepackage{microtype}
 \usepackage{lipsum}
 \begin{document}
 
-\linebreakersetup{maxemergencystretch=1em}
+\linebreakersetup{maxemergencystretch=0.8em}
+
 
 \section{Jak je třeba vytvořit Epub pro Xteink}
 
@@ -115,11 +117,18 @@ Bez ditheringu na počítači vypadá výsledek líp a i na čtečce asi vypadá
 
 Asi bude třeba vyzkoušet nějaký jiný firmware, ale skoro všechno je založený na Crosspointu, takže to nevypadá moc nadějně.
 
+% \ResponsiveSetup{characters=35,scale=heptatonic}
+
+% \setsizes{35}
+
+% Následující text bude menší, protože zkouším 35 znaků na řádek
+
 \subsection{Další pokus s XTC}
 
 Vyzkoušel jsem ještě jednou vytvořit XTC soubor pomocí \texttt{cbz2xtc} (\protect\url{https://github.com/srokl/cbz2xtc}), 
-který vytváří soubor, co přečte i Crosspoint. Teda aspoň ten černobílej, umí i soubor XTCH, se 4 odstínama šedi, ale 
-ten Crosspoint neotevře s hláškou \texttt{Memory error}. 
+který vytváří soubor, co přečte i Crosspoint. Teda aspoň ten černobílej, umí i soubor XTCH, se 4 odstínama šedi. 
+Ten Crosspoint neotevřel s hláškou \texttt{Memory error}, ale když jsem to zkoušel pozdějec v Crosspoint 1.3, už se otevřel. 
+Výsledek je dobrej, písmo není kostičkovaný a stránky se zobrazujou rychle (narozdíl od Papyrusu).
 
 Musel jsem trošku zasáhnout do zdrojáků toho nástroje, protože vždycky rozsekává stránky na několik obrázků. S touhle změnou 
 pak můžu spustit: 
@@ -132,6 +141,12 @@ To je moje modifikovaná verze skriptu \texttt{cbz2xtc.py}. Volbu \texttt{--no-s
 zesílí písmo. Dithering je zakázanej, protože pro text vlastně vůbec nefunguje dobře.
 
 Výsledek má občas trošku deformovaný písmenka, ale jinak to vypadá minimálně stejně dobře, jako ten Epub, možná i trošku líp.
+
+% \ResponsiveSetup{characters=40,scale=heptatonic}
+
+% \setsizes{40}
+
+% Následující text bude ještě menší, protože zkouším 40 znaků na řádek
 
 \subsection{Pokus s Papyrus}
 
