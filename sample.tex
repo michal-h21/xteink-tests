@@ -52,7 +52,7 @@
 
 \usepackage{linebreaker}
 
-\usepackage[characters=35 ,scale=heptatonic]{responsive}
+\usepackage[characters=45 ,scale=heptatonic]{responsive}
 \usepackage{microtype}
 \usepackage{lipsum}
 \begin{document}
@@ -141,6 +141,21 @@ To je moje modifikovaná verze skriptu \texttt{cbz2xtc.py}. Volbu \texttt{--no-s
 zesílí písmo. Dithering je zakázanej, protože pro text vlastně vůbec nefunguje dobře.
 
 Výsledek má občas trošku deformovaný písmenka, ale jinak to vypadá minimálně stejně dobře, jako ten Epub, možná i trošku líp.
+
+\texttt{cbz2xtc} podporuje další volbu, \texttt{--downscale}, která hodně ovlivňuje způsob, jak se ten obrázek rozpixeluje. Podporuje následující volby:
+
+\begin{description}
+  \item[bicubic] -- to je defaultní metoda, průměrný výsledky
+  \item[bilinear] -- lepší volba
+  \item[box] -- nepoužitelný, rozpixelovaný
+  \item[lanczos] -- asi nejlepší
+  \item[nearest] -- nefunguje dobře, rozpixelovaný
+\end{description}
+
+Tahle volba zatím dává nejlepší výsledky i pro menší písmo (zkoušel jsem to s volbou \texttt{characters=45} balíčku Responsive):
+\begin{lstlisting}
+$ python nosplit.py --downscale bicubic --2bit --contrast-boost 2 --no-dither  --no-split sample.pdf 
+\end{lstlisting}
 
 % \ResponsiveSetup{characters=40,scale=heptatonic}
 
