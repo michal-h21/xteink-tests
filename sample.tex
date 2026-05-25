@@ -157,6 +157,19 @@ Tahle volba zatím dává nejlepší výsledky i pro menší písmo (zkoušel js
 $ python nosplit.py --downscale bicubic --clean --2bit --contrast-boost 2 --no-dither  --no-split sample.pdf 
 \end{lstlisting}
 
+
+\subsection{Další pokus s Epubem}
+
+Ty XTCH soubory jsou hodně velký, každá stránka má konstantní velikost protože nefunguje žádná komprese. \texttt{cbz2xtc.py} ale vytváří
+dočasný PNG soubory, který můžeme zachovat, když nepoužijeme volbu \texttt{--clean}. Nacházejí se v adresáři \texttt{.temp\_png/}, kde 
+se pro každej PDF soubor vytváří podadresář. V našem případě můžeme vytvořit Epub soubor pomocí \texttt{img2epub.lua}:
+
+\begin{lstlisting}
+$ exlua img2epub.lua .temp_png/sample/ sample.epub
+\end{lstlisting}
+
+Výslednej soubor má velikot zhruba čtvriny XTCH souboru, ale ještě jsem nezkoušel, jak rychle se bude zobrazovat na čtečce.
+
 % \ResponsiveSetup{characters=40,scale=heptatonic}
 
 % \setsizes{40}
