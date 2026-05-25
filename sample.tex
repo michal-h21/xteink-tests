@@ -168,7 +168,9 @@ se pro každej PDF soubor vytváří podadresář. V našem případě můžeme 
 $ exlua img2epub.lua .temp_png/sample/ sample.epub
 \end{lstlisting}
 
-Výslednej soubor má velikot zhruba čtvriny XTCH souboru, ale ještě jsem nezkoušel, jak rychle se bude zobrazovat na čtečce.
+Výslednej soubor má velikot zhruba čtvriny XTCH souboru, ale Crosspoint to
+vykreslí úplně tragicky. Jednak obrázek trošku zmenší a navíc očividně udělá
+dithering a černobílej obrázek. Výsledek je dost nečitelnej.
 
 % \ResponsiveSetup{characters=40,scale=heptatonic}
 
