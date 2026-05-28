@@ -165,7 +165,7 @@ dočasný PNG soubory, který můžeme zachovat, když nepoužijeme volbu \textt
 se pro každej PDF soubor vytváří podadresář. V našem případě můžeme vytvořit Epub soubor pomocí \texttt{img2epub.lua}:
 
 \begin{lstlisting}
-$ exlua img2epub.lua .temp_png/sample/ sample.epub
+$ texlua img2epub.lua .temp_png/sample/ sample.epub
 \end{lstlisting}
 
 Výslednej soubor má velikot zhruba čtvriny XTCH souboru, ale Crosspoint to
@@ -193,6 +193,43 @@ než Crosspoint.
 
 Závěr je, že XTCH se zobrauje dobře, ale je to obecně pomalý, tak budu ještě zkoušet dál.
 
+\begin{enumerate}
+  \item Zkusit vytvořit Epub s 16 barvama, ale bez ditheringu, a zkusit ho otevřít v Papyrusu. Třeba to bude vypadat líp než v Crosspointu.
+  \item Hlavně chci vyzkoušet dostatečně dlouhej řádek v enumerate\footnote{A jak vlastně bude vypadat poznámka pod čarou? Klidně může bejt trošku delší}
+\end{enumerate}
+
+a ještě itemize: 
+
+\begin{itemize}
+  \item Zkusit vytvořit Epub s 16 barvama, ale bez ditheringu, a zkusit ho otevřít v Papyrusu. Třeba to bude vypadat líp než v Crosspointu.
+  \item Hlavně chci vyzkoušet dostatečně dlouhej řádek v enumerate
+    \begin{enumerate}
+      \item tohle je zanořenej list
+      \item a další položka. Je důležitý, aby byla dostatečně dlouhá, aby se zalomila a otestovala zalamování řádků v enumerate.
+      \item ve skutečnosti potřebuju další položku, protože tady dochází k zalomení stránky
+    \end{enumerate}
+\end{itemize}
+
+
+A jak vlastně vypadájí tabulky?
+
+\begin{table}[h]
+\begin{tabular}{l|l|l}
+  A & B & C \\
+  D & E & F \\
+  G & H & I \\
+\end{tabular}
+\end{table}
+
+Nějaký text po tabulce.
+
+No a taky musíme vyzkoušet matematiku:
+
+\[
+  f(x) = \int_{-\infty}^\infty \hat{f}(\xi) e^{2\pi i \xi x} d\xi
+\]
+
+Tady pokračujeme dál, abychom otestovali zalamování řádků. A ještě zkusíme nějakou delší větu, která se nevejde do jednoho řádku a bude se muset zalomit.
 % input{cviceni}
 % \input{epigram}
 \end{document}
